@@ -1,0 +1,38 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+const projectRoot = process.cwd();
+
+function fail(message) {
+  console.error(message);
+  process.exit(1);
+}
+
+const nodeMajor = Number.parseInt(process.versions.node.split('.')[0], 10);
+if (!Number.isInteger(nodeMajor) || nodeMajor < 22) {
+  fail(`Node.js 22 or newer is required. Current version: ${process.versions.node}`);
+}
+
+if (!process.env.npm_config_user_agent?.includes('pnpm/9.')) {
+  fail('pnpm 9 is required. Run corepack use pnpm@9.15.9 or use the packageManager field.');
+}
+
+for (const requiredFile of ['package.json', 'pnpm-lock.yaml', 'env.local.example']) {
+  if (!fs.existsSync(path.join(projectRoot, requiredFile))) {
+    fail(`Missing required file: ${requiredFile}`);
+  }
+}
+
+const envPath = path.join(projectRoot, '.env.local');
+if (!fs.existsSync(envPath)) {
+  fail('Missing .env.local. Copy env.local.example to .env.local and add Agora credentials.');
+}
+
+const envContents = fs.readFileSync(envPath, 'utf8');
+for (const key of ['NEXT_PUBLIC_AGORA_APP_ID', 'NEXT_AGORA_APP_CERTIFICATE']) {
+  if (!new RegExp(`^${key}=.+$`, 'm').test(envContents)) {
+    fail(`.env.local is missing a non-empty ${key} value.`);
+  }
+}
+
+console.log('Doctor checks passed.');

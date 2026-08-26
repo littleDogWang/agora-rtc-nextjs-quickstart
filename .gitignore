@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# tests
+coverage/
+
+# local credentials
+.env*
+!env.local.example
+
+# local tooling
+.DS_Store
+*.log
+.vercel/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
