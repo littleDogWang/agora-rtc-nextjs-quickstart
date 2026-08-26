@@ -85,6 +85,10 @@ This repository is a development demo. The token endpoint has no application log
 
 ## Deploy to Vercel
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FlittleDogWang%2Fagora-rtc-nextjs-quickstart&project-name=agora-rtc-nextjs-quickstart&repository-name=agora-rtc-nextjs-quickstart&env=NEXT_PUBLIC_AGORA_APP_ID%2CNEXT_AGORA_APP_CERTIFICATE&envDescription=Agora+credentials+needed+to+run+the+RTC+quickstart&envLink=https%3A%2F%2Fgithub.com%2FlittleDogWang%2Fagora-rtc-nextjs-quickstart%23run-it&demo-title=Agora+RTC+Next.js+Quickstart&demo-description=One-to-one+audio+and+video+calling+with+Agora+RTC+and+Next.js)
+
+This repository is private. The Vercel account deploying it must have GitHub Integration access to `littleDogWang/agora-rtc-nextjs-quickstart`.
+
 Vercel can deploy this repository as a standard Next.js project:
 
 1. Push or fork the repository to a Git provider supported by Vercel.
@@ -94,8 +98,6 @@ Vercel can deploy this repository as a standard Next.js project:
 5. Open the same deployed room URL in a second independent client for the recommended complete check.
 
 The deployment is public by default. Use a dedicated Agora demo project, do not attach production credentials to untrusted Preview Environments, and remove the deployment or rotate the App Certificate when the demo is no longer needed.
-
-A repository-specific **Deploy with Vercel** button can be added after this starter has a stable public repository URL.
 
 ## Architecture
 
