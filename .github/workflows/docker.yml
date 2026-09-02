@@ -1,0 +1,43 @@
+name: Docker
+
+on:
+  push:
+  pull_request:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build production image
+        run: >-
+          docker build
+          --build-arg NEXT_PUBLIC_AGORA_APP_ID=0123456789abcdef0123456789abcdef
+          --tag agora-rtc-nextjs-quickstart:test
+          .
+
+      - name: Start container
+        run: >-
+          docker run --detach
+          --name agora-rtc-nextjs-quickstart
+          --publish 3000:3000
+          --env NEXT_PUBLIC_AGORA_APP_ID=0123456789abcdef0123456789abcdef
+          --env NEXT_AGORA_APP_CERTIFICATE=fedcba9876543210fedcba9876543210
+          agora-rtc-nextjs-quickstart:test
+
+      - name: Verify HTTP startup
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:3000/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs agora-rtc-nextjs-quickstart
+          exit 1
+
+      - name: Stop container
+        if: always()
+        run: docker rm --force agora-rtc-nextjs-quickstart || true

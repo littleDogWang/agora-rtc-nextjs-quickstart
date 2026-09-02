@@ -2,21 +2,62 @@
 
 This repository is the Agora RTC Web one-to-one quickstart for Next.js.
 
-## Start Here
+## How To Load
 
-- Read `README.md` for setup, user flows, verification, and the public-demo boundary.
-- Read `docs/superpowers/specs/2026-08-26-rtc-nextjs-quickstart-design.md` before changing architecture or scope.
-- Run `pnpm run verify` before declaring implementation changes complete.
+1. Read [docs/ai/L0_repo_card.md](docs/ai/L0_repo_card.md).
+2. Read [docs/ai/RECIPE.md](docs/ai/RECIPE.md).
+3. Load all eight files in [docs/ai/L1/](docs/ai/L1/).
+4. Follow [docs/ai/L1/L2/_index.md](docs/ai/L1/L2/_index.md) only when a task needs a listed deep dive.
+5. Use [README.md](README.md) for user workflows and [ARCHITECTURE.md](ARCHITECTURE.md) for canonical topology and lifecycle.
 
-## System Shape
+## Current System Shape
 
 - Next.js App Router and React
-- Direct `agora-rtc-sdk-ng` integration; do not add `agora-rtc-react`
-- Server-side RTC token generation through `POST /api/token`
-- URL-only room identity; no room database
-- Starter-aligned home, pre-join, and in-call UI
+- direct `agora-rtc-sdk-ng` integration; do not add `agora-rtc-react`
+- server-side RTC token generation through `POST /api/token`
+- URL-only room identity with no room database
+- one browser-owned RTC client per mounted room session
+- Vercel and standalone Docker production modes
 
-## Invariants
+## Supported Modes
+
+- local development with `pnpm dev`
+- local production with `pnpm run build && pnpm run start`
+- Vercel frontend plus request-scoped token route
+- Docker standalone Next.js process on port 3000
+
+## Routing / Ownership
+
+- UI and interaction state: `components/`
+- validated room route: `app/room/[roomId]/page.tsx`
+- HTTP token contract: `app/api/token/route.ts`
+- RTC token construction: `lib/token.ts`
+- browser token client: `lib/token-client.ts`
+- RTC lifecycle: `lib/rtc-session.ts`
+- device and local-track ownership: `lib/media-devices.ts`
+- room and UID validation: `lib/room-id.ts`
+- behavior contracts: `tests/`
+
+## Key Files
+
+- `components/room-experience.tsx` - device initialization and room UI phases
+- `components/pre-join.tsx` - local preview and initial device state
+- `components/call-view.tsx` - waiting and peer-present call layout
+- `app/api/token/route.ts` - initial token and same-UID renewal
+- `lib/rtc-session.ts` - join, publish, subscribe, renew, and cleanup
+- `scripts/doctor.mjs` - local runtime and environment checks
+- `ARCHITECTURE.md` - canonical runtime and ownership model
+- `docs/ai/RECIPE.md` - extension points, invariants, and stable contracts
+
+## Patterns And Anti-Patterns
+
+- Keep RTC imports in client code and App Certificate reads in server code.
+- Extend existing ownership boundaries instead of duplicating RTC clients or token builders.
+- Keep room identity in the URL; do not add persistence without an explicit scope decision.
+- Keep visible UI copy operational and use Lucide icons for familiar controls.
+- Do not treat build, HTTP, token issue, or single-client join as remote media proof.
+
+## RTC Invariants
 
 1. Keep `NEXT_AGORA_APP_CERTIFICATE` server-side only. Never return, log, screenshot, or bundle it.
 2. Generate RTC-only tokens with `RtcTokenBuilder.buildTokenWithUid` and `RtcRole.PUBLISHER`.
@@ -41,13 +82,13 @@ This repository is the Agora RTC Web one-to-one quickstart for Next.js.
 
 Mock `agora-rtc-sdk-ng` at the owned module/client boundary. Tests must cover:
 
-- correct room and UID on join
-- local track publication
-- independent audio and video subscription
-- token renewal before expiry
-- device switching and partial media failures
-- cleanup ordering and idempotency
-- single-client waiting and two-participant UI states
+- correct room and UID on join;
+- local track publication;
+- independent audio and video subscription;
+- token renewal before expiry;
+- device switching and partial media failures;
+- cleanup ordering and idempotency; and
+- single-client waiting and two-participant UI states.
 
 Do not mark implementation work complete without tests.
 
@@ -57,13 +98,50 @@ Do not mark implementation work complete without tests.
 pnpm install
 pnpm run doctor
 pnpm dev
+pnpm run lint
+pnpm run typecheck
+pnpm test
+pnpm run build
 pnpm run verify
 ```
 
+Docker commands and environment ownership are documented in README.
+
+## Verification Safety
+
+- Lint, typecheck, unit tests, and build may use obviously synthetic credentials.
+- Docker build, startup, and HTTP smoke may use synthetic credentials and prove packaging only.
+- A browser join requires real credentials, network access, and device permission.
+- Complete RTC success requires two independent clients with different UIDs in the same room and observed audio and video receipt in both directions.
+- Never print, commit, screenshot, or bake a real App Certificate into an image.
+
+## Done Criteria
+
+1. Run the narrowest relevant test.
+2. Run `pnpm run verify` for shipped changes.
+3. Build and start the production image when runtime or packaging can change.
+4. Update README, ARCHITECTURE, AGENTS, RECIPE, and affected L1 docs when their contracts change.
+5. State static, packaging, single-client, and complete RTC evidence separately.
+
+## Git Conventions
+
+- Use conventional commits: `type: description` or `type(scope): description`.
+- Use lowercase, present-tense descriptions.
+- Do not add AI attribution trailers.
+- Do not use `--no-verify`.
+- A request to edit does not authorize commit, push, or another remote write.
+
 ## Documentation Synchronization
 
-When a route, environment key, lifecycle rule, UI workflow, success condition, or deployment boundary changes, update `README.md`, this file, affected tests, and the design/plan documents in the same local change.
+When a route, environment key, lifecycle rule, UI workflow, success condition,
+or deployment boundary changes, update its owning document and every summary
+that links to it. Keep README, ARCHITECTURE, RECIPE, affected L1 files, tests,
+CI, and Docker behavior consistent.
 
 ## Deployment Boundary
 
-Vercel deployment is a public development demo. The token route has no application login, room authorization, or built-in rate limiting. Never describe this repository as a production token service. Production use requires authentication, room authorization, server-controlled identity and role, rate limiting, abuse controls, and monitoring.
+Vercel and Docker deployments are public development demos unless application
+access controls are added. The token route has no login, room authorization, or
+rate limiting. Never describe it as a production token service. Production use
+requires authentication, room authorization, server-controlled identity and
+role, abuse controls, and monitoring.

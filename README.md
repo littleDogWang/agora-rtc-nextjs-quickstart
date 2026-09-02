@@ -1,128 +1,150 @@
 # Agora RTC Next.js Quickstart
 
-A one-to-one audio and video calling starter built with Next.js and the Agora RTC Web SDK. Create a room, check your devices, join from one client, then open the same room URL from another client for the complete RTC experience.
+A one-to-one audio and video calling starter built with Next.js and the Agora
+RTC Web SDK. Create a room, check your devices, join from one client, then open
+the same room URL from another independent client for complete RTC media.
 
 ![Agora RTC Next.js quickstart home](./.github/assets/rtc-nextjs-home.png)
 
 ## Prerequisites
 
-- [Node.js 22+](https://nodejs.org/en/download/)
+- Node.js 22 or newer
 - pnpm 9.15.9
 - An Agora project with an App ID and primary App Certificate
+- A supported browser with camera and microphone permission for live RTC
+- Docker for the container workflow
 
 ## Run It
 
-1. Install dependencies:
+```bash
+pnpm install
+cp env.local.example .env.local
+```
 
-   ```bash
-   pnpm install
-   ```
+Set both Agora values in `.env.local`, then run:
 
-2. Create the local environment file:
+```bash
+pnpm run doctor
+pnpm dev
+```
 
-   ```bash
-   cp env.local.example .env.local
-   ```
+Open [http://localhost:3000](http://localhost:3000), select **Create Room**,
+complete device setup, and select **Join Call**.
 
-3. Add the two Agora values to `.env.local`:
+## Working From A Clone
 
-   ```dotenv
-   NEXT_PUBLIC_AGORA_APP_ID=your_app_id
-   NEXT_AGORA_APP_CERTIFICATE=your_app_certificate
-   ```
+```bash
+git clone https://github.com/littleDogWang/agora-rtc-nextjs-quickstart.git
+cd agora-rtc-nextjs-quickstart
+pnpm install
+cp env.local.example .env.local
+```
 
-4. Check the environment and start the app:
+Add credentials to `.env.local`, run `pnpm run doctor`, and start with
+`pnpm dev`. The repository does not create or bind an Agora project for you.
 
-   ```bash
-   pnpm run doctor
-   pnpm dev
-   ```
+## Environment Variables
 
-5. Open [http://localhost:3000](http://localhost:3000) and select **Create Room**.
+| Variable | Required | Owner | Description |
+| --- | --- | --- | --- |
+| `NEXT_PUBLIC_AGORA_APP_ID` | Yes | Public project configuration | Agora project identifier returned to the browser with its RTC token. |
+| `NEXT_AGORA_APP_CERTIFICATE` | Yes | Next.js server only | Secret used by `POST /api/token`; never expose, log, bundle, or bake it into an image. |
 
-## Use the Quickstart
+Local development reads `.env.local`. Vercel uses project environment
+variables. Docker receives the public App ID at build and runtime and the App
+Certificate only at runtime.
+
+## Use The Quickstart
 
 ### Single-client success
 
-On the pre-join screen, select your microphone and camera, choose their initial state, and select **Join Call**. A successful single-client run:
+On the pre-join screen, select your microphone and camera, choose their initial
+state, and select **Join Call**. A successful single-client run:
 
-- issues an RTC token
-- joins the generated room with a numeric UID
-- publishes every available local media track
-- keeps local preview and controls active
-- shows **Waiting for another participant**
+- issues an RTC token;
+- joins the generated room with a numeric UID;
+- publishes every available local media track;
+- keeps local preview and controls active; and
+- shows **Waiting for another participant**.
 
-Single-client join is a supported quickstart result.
+Single-client join is supported, but it does not prove remote media.
 
 ### Complete one-to-one experience
 
-Copy the room URL and open that same URL in a second tab, window, browser profile, or device. Complete pre-join and join independently in each client. The complete RTC experience has two different UIDs and remote audio/video subscription in both directions.
+Open the exact same room URL in a second tab, window, browser profile, or device.
+Complete pre-join and join independently in each client. Complete RTC success
+requires two different UIDs and actual remote audio and video receipt in both
+directions.
 
 When testing twice on one computer:
 
-- wear headphones or mute one microphone to avoid feedback
-- some cameras cannot be captured by two browser contexts; turn one camera off if needed
-- both clients must use the exact same `/room/<room-id>` URL
+- wear headphones or mute one microphone to avoid feedback;
+- turn one camera off if the device cannot serve two browser contexts; and
+- confirm both clients use the same `/room/<room-id>` URL.
 
 ## What You Get
 
-- Next.js App Router UI matching the Agora agent starter's visual shell
-- pre-join camera preview and device selection
-- microphone and camera selection during the call
-- explicit `agora-rtc-sdk-ng` join, publish, subscribe, renew, and cleanup lifecycle
+- Next.js App Router UI matching the Agora agent starter visual shell
+- pre-join preview and microphone/camera selection
+- microphone and camera controls during the call
+- direct `agora-rtc-sdk-ng` join, publish, subscribe, renewal, and cleanup
 - URL-only UUID rooms with no database
-- RTC-only Publisher tokens generated server-side
+- server-generated RTC publisher tokens
 - single-client waiting and two-participant call states
 - responsive desktop and mobile layouts
+- Vercel and Docker production paths
 
-## Token and Security Model
+## How It Works
 
-`POST /api/token` accepts a UUID room ID and an optional existing numeric UID. Initial requests receive a securely generated UID; renewal requests reuse the joined UID. Tokens use `buildTokenWithUid`, Publisher role, and a 3600-second relative expiration.
+The home page creates a UUID room URL. The room initializes available local
+media but does not join until the user acts. `POST /api/token` validates the
+room, creates or reuses a numeric UID, and returns a non-cacheable RTC token.
+The browser registers events, joins, publishes local tracks, and subscribes to
+remote audio and video independently. Token renewal reuses the same room and UID.
+Leaving releases listeners, tracks, devices, and the RTC client.
 
-The App Certificate is never exposed to the browser. Token responses use `Cache-Control: no-store`.
-
-This repository is a development demo. The token endpoint has no application login, room authorization, or built-in rate limiting. Before production use, add authentication, room authorization, server-controlled identity and role, rate limiting, abuse controls, and monitoring.
-
-## Deploy to Vercel
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FlittleDogWang%2Fagora-rtc-nextjs-quickstart&project-name=agora-rtc-nextjs-quickstart&repository-name=agora-rtc-nextjs-quickstart&env=NEXT_PUBLIC_AGORA_APP_ID%2CNEXT_AGORA_APP_CERTIFICATE&envDescription=Agora+credentials+needed+to+run+the+RTC+quickstart&envLink=https%3A%2F%2Fgithub.com%2FlittleDogWang%2Fagora-rtc-nextjs-quickstart%23run-it&demo-title=Agora+RTC+Next.js+Quickstart&demo-description=One-to-one+audio+and+video+calling+with+Agora+RTC+and+Next.js)
-
-This repository is private. The Vercel account deploying it must have GitHub Integration access to `littleDogWang/agora-rtc-nextjs-quickstart`.
-
-Vercel can deploy this repository as a standard Next.js project:
-
-1. Push or fork the repository to a Git provider supported by Vercel.
-2. Import the repository in Vercel.
-3. Add `NEXT_PUBLIC_AGORA_APP_ID` and `NEXT_AGORA_APP_CERTIFICATE` in Project Settings -> Environment Variables.
-4. Deploy, create a room, and verify a single-client join on the HTTPS deployment.
-5. Open the same deployed room URL in a second independent client for the recommended complete check.
-
-The deployment is public by default. Use a dedicated Agora demo project, do not attach production credentials to untrusted Preview Environments, and remove the deployment or rotate the App Certificate when the demo is no longer needed.
-
-## Architecture
-
-```mermaid
-flowchart LR
-  A[Create Room] --> B[Pre-join Devices]
-  B --> C[POST /api/token]
-  C --> D[Join Agora RTC Room]
-  D --> E[Publish Local Tracks]
-  F[Second Client] --> B
-  E <--> G[Subscribe and Play Remote Tracks]
-  D --> H[Renew Same Room and UID]
-```
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the canonical topology and lifecycle.
 
 ## Commands
 
+### Setup
+
 ```bash
-pnpm run doctor     # Node, pnpm, files, and non-empty env checks
-pnpm dev            # Next.js development server
-pnpm run lint       # ESLint
-pnpm run typecheck  # TypeScript
-pnpm test           # unit and component tests
-pnpm run build      # production build
-pnpm run verify     # lint + typecheck + test + build
+pnpm install           # install the locked dependency graph
+pnpm run doctor        # check Node, pnpm, required files, and local env values
 ```
+
+### Development
+
+```bash
+pnpm dev               # Next.js development server
+pnpm run start         # start an existing production build
+pnpm run test:watch    # Vitest watch mode
+```
+
+### Quality
+
+```bash
+pnpm run lint          # ESLint
+pnpm run typecheck     # TypeScript without emit
+pnpm test              # unit and component tests
+pnpm run build         # production build
+```
+
+### CI / Pre-ship
+
+```bash
+pnpm run verify        # lint + typecheck + test + build
+```
+
+## Architecture
+
+The browser owns UI state, local devices, and one RTC client. The Next.js Node
+process owns token generation and the App Certificate. Agora owns channel and
+media transport. The application has no room database or persistent backend.
+
+Read [ARCHITECTURE.md](ARCHITECTURE.md) for component, API, lifecycle, Vercel,
+Docker, and production boundaries.
 
 ## Repository Map
 
@@ -134,23 +156,72 @@ pnpm run verify     # lint + typecheck + test + build
 - `lib/rtc-session.ts` - Agora client lifecycle
 - `lib/media-devices.ts` - partial media and device handling
 - `tests/` - token, RTC, device, and UI contracts
-- `AGENTS.md` - implementation invariants
+- `docs/ai/` - progressive coding-agent context
+- `AGENTS.md` - coding-agent loading and implementation constraints
 
 ## Troubleshooting
 
 - **Credentials are not configured:** confirm both `.env.local` values are non-empty, then restart Next.js.
-- **Camera or microphone permission was denied:** allow the site in browser permissions and select Retry Device Setup.
-- **Only one media type works:** the quickstart supports audio-only or video-only joins when one device is unavailable.
-- **No remote video:** confirm both clients use the same room URL and that the remote camera is enabled.
-- **No remote audio:** confirm the remote microphone is enabled and browser audio playback is not muted.
-- **Two local tabs cannot use the camera:** turn off one camera or use another browser/device.
+- **Camera or microphone permission was denied:** allow the site in browser permissions and retry device setup.
+- **Only one media type works:** audio-only or video-only join is supported when one device is unavailable.
+- **No remote video:** confirm both clients use the same room URL and the remote camera is enabled.
+- **No remote audio:** confirm the remote microphone is enabled and browser playback is not muted.
+- **Two local tabs cannot use the camera:** turn off one camera or use another browser or device.
+- **Container starts but RTC fails:** verify build-time and runtime App IDs match and runtime credentials are real; HTTP startup alone is not RTC evidence.
+
+## Deployment
+
+### Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FlittleDogWang%2Fagora-rtc-nextjs-quickstart&project-name=agora-rtc-nextjs-quickstart&repository-name=agora-rtc-nextjs-quickstart&env=NEXT_PUBLIC_AGORA_APP_ID%2CNEXT_AGORA_APP_CERTIFICATE&envDescription=Agora+credentials+needed+to+run+the+RTC+quickstart&envLink=https%3A%2F%2Fgithub.com%2FlittleDogWang%2Fagora-rtc-nextjs-quickstart%23run-it&demo-title=Agora+RTC+Next.js+Quickstart&demo-description=One-to-one+audio+and+video+calling+with+Agora+RTC+and+Next.js)
+
+The Vercel account must have repository access. Configure both environment
+variables, deploy, verify single-client join, then use two independent clients
+for complete media evidence.
+
+### Docker
+
+Build with the public App ID:
+
+```bash
+docker build \
+  --build-arg NEXT_PUBLIC_AGORA_APP_ID=your_app_id \
+  --tag agora-rtc-nextjs-quickstart .
+```
+
+Run with the same App ID and the server-only certificate:
+
+```bash
+docker run --rm --publish 3000:3000 \
+  --env NEXT_PUBLIC_AGORA_APP_ID=your_app_id \
+  --env NEXT_AGORA_APP_CERTIFICATE=your_app_certificate \
+  agora-rtc-nextjs-quickstart
+```
+
+Open `http://localhost:3000`. Image build, process startup, and HTTP availability
+prove packaging only; they do not prove RTC token validity or media.
+
+## Security
+
+The App Certificate remains server-side and token responses are non-cacheable.
+The token route validates room IDs and UIDs but has no application login, room
+authorization, server-controlled identity, or rate limiting.
+
+Use a dedicated demo project. Do not attach production credentials to untrusted
+preview environments. Remove public demos and rotate the App Certificate when
+they are no longer needed. Production use requires authentication,
+authorization, abuse controls, and monitoring.
 
 ## More Documentation
 
+- [Agent development guide](AGENTS.md)
+- [Architecture](ARCHITECTURE.md)
+- [Contributing](CONTRIBUTING.md)
+- [AI repository card](docs/ai/L0_repo_card.md)
 - [Agora Video Calling React Quickstart](https://docs.agora.io/en/video-calling/get-started/get-started-sdk?platform=react-js)
 - [Agora RTC Web SDK API](https://api-ref.agora.io/en/video-sdk/web/4.x/index.html)
 - [Deploy a Token Server](https://docs.agora.io/en/video-calling/token-authentication/deploy-token-server)
 
 ## License
 
-Released under the [MIT License](./LICENSE).
+Released under the [MIT License](LICENSE).

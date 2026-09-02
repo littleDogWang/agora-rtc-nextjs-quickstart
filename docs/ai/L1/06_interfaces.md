@@ -1,0 +1,35 @@
+# 06 Interfaces
+
+> API, event, environment, and external service contracts.
+
+## Browser Or User-Facing APIs
+
+`POST /api/token` accepts `{ roomId: string, uid?: number }`. Success returns
+`appId`, `roomId`, `uid`, `token`, and `expiresIn`. Invalid JSON, room ID, or UID
+returns 400. Missing configuration or token failure returns a generic 500. Every
+response uses `Cache-Control: no-store`.
+
+## Events And Media
+
+`RtcSession` handles `user-joined`, `user-published`, `user-unpublished`,
+`user-left`, `connection-state-change`, token expiry warnings, and `exception`.
+Audio and video publications arrive independently. Remote audio is played after
+subscription; remote video is exposed to the view after subscription.
+
+## Environment Contract
+
+`NEXT_PUBLIC_AGORA_APP_ID` is the public project identifier.
+`NEXT_AGORA_APP_CERTIFICATE` is server-only. Docker requires the public App ID at
+build and both values at runtime; the certificate is never a build argument.
+
+## External Services
+
+- Agora RTC Web SDK `4.24.3`
+- `agora-token` `2.0.5`
+- Agora RTC channel service
+
+The runtime assumes token authentication and network access to Agora services.
+
+## Related Deep Dives
+
+None.

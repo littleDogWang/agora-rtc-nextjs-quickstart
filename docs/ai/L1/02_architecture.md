@@ -1,0 +1,37 @@
+# 02 Architecture
+
+> System topology, data flow, and lifecycle overview.
+
+## Components
+
+- Next.js App Router pages and API route
+- React client components for pre-join and call state
+- Agora RTC Web SDK browser client
+- server-side `agora-token` builder
+- Agora RTC channel transport
+
+See [ARCHITECTURE.md](../../../ARCHITECTURE.md) for the canonical topology.
+
+## Data And Event Flow
+
+The browser initializes available local media, requests a scoped token after an
+explicit join action, registers events, joins, publishes local tracks, and
+subscribes to audio and video independently. Renewal reuses room and UID.
+Cleanup unregisters, unpublishes, stops, closes, and leaves.
+
+## Ownership Boundaries
+
+`components/room-experience.tsx` owns UI phases, `lib/media-devices.ts` owns
+devices, `app/api/token/route.ts` and `lib/token.ts` own credentials, and
+`lib/rtc-session.ts` owns the RTC client lifecycle. Agora owns media transport.
+
+## Runtime Modes
+
+- local development: `pnpm dev` on localhost
+- local or hosted production: Next.js build and Node process
+- Vercel: frontend plus request-scoped token route
+- Docker: stateless standalone server on port 3000 with runtime environment
+
+## Related Deep Dives
+
+None.
