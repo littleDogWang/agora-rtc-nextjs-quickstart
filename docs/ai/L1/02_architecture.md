@@ -14,10 +14,11 @@ See [ARCHITECTURE.md](../../../ARCHITECTURE.md) for the canonical topology.
 
 ## Data And Event Flow
 
-The browser initializes available local media, requests a scoped token after an
-explicit join action, registers events, joins, publishes local tracks, and
-subscribes to audio and video independently. Renewal reuses room and UID.
-Cleanup unregisters, unpublishes, stops, closes, and leaves.
+The browser initializes available local media from system-selected devices and
+exposes the room URL for invitation. After an explicit join action it requests a
+scoped token, registers events, joins, publishes local tracks, and subscribes to
+audio and video independently. Renewal reuses room and UID. Cleanup unregisters,
+unpublishes, stops, closes, and leaves.
 
 ## Ownership Boundaries
 

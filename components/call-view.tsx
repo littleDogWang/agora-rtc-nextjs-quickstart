@@ -9,6 +9,7 @@ import type { LocalMedia } from '@/lib/media-devices';
 import { Button } from '@/components/ui/button';
 import { CallControls } from '@/components/call-controls';
 import { ConnectionStatus } from '@/components/connection-status';
+import { InviteButton } from '@/components/invite-button';
 import { VideoTile } from '@/components/video-tile';
 
 type CallViewProps = {
@@ -82,6 +83,7 @@ export function CallView({
             remoteUser={remoteUser}
             videoEnabled={Boolean(remoteUser?.videoTrack)}
             waitingMessage="Waiting for another participant"
+            waitingAction={remoteUser ? null : <InviteButton label="Invite participant" />}
           />
         </div>
 

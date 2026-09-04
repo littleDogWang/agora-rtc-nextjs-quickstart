@@ -30,7 +30,8 @@ stable_contracts:
 
 ## Recipe Scope
 
-The baseline creates UUID room URLs, prepares partial local media, issues
+The baseline creates UUID room URLs, exposes invitation actions before join and
+while waiting, prepares partial local media from system-selected devices, issues
 server-side RTC publisher tokens, joins and publishes on explicit user action,
 subscribes to remote audio and video, renews tokens, and releases resources.
 
@@ -57,6 +58,7 @@ token behavior from memory.
 - `rtc-resource-cleanup`: register handlers before join; unpublish, stop, close, and leave during idempotent cleanup.
 - Audio and video publication events are independent.
 - One missing media device does not block the other available media type.
+- System-selected devices are the default path; manual device selection remains optional.
 
 ## Stable Contracts
 
@@ -80,6 +82,7 @@ pnpm run doctor
 pnpm dev
 ```
 
-Join once for the supported single-client state. Then use the exact same room URL
-from a second independent client and verify audio and video receipt both ways.
+Copy the invite link before joining, then join once for the supported single-client
+state. Use the exact same room URL from a second independent client and verify
+audio and video receipt both ways.
 Run `pnpm run verify` before shipping a customization.

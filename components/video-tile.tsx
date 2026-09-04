@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import type { ReactNode } from 'react';
 import { CameraOff, UserRound } from 'lucide-react';
 import type { ICameraVideoTrack, IAgoraRTCRemoteUser } from 'agora-rtc-sdk-ng';
 
@@ -11,6 +12,7 @@ type VideoTileProps = {
   videoEnabled?: boolean;
   waitingMessage?: string;
   compact?: boolean;
+  waitingAction?: ReactNode;
 };
 
 export function VideoTile({
@@ -20,6 +22,7 @@ export function VideoTile({
   videoEnabled = true,
   waitingMessage,
   compact = false,
+  waitingAction,
 }: VideoTileProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoTrack = localTrack ?? remoteUser?.videoTrack ?? null;
@@ -53,6 +56,7 @@ export function VideoTile({
           <p className="max-w-xs text-sm text-[#a8adb7]">
             {waitingMessage ?? (hasParticipant ? 'Camera is off' : 'Waiting for video')}
           </p>
+          {waitingAction}
         </div>
       )}
 

@@ -43,6 +43,7 @@ This repository is the Agora RTC Web one-to-one quickstart for Next.js.
 - `components/room-experience.tsx` - device initialization and room UI phases
 - `components/pre-join.tsx` - local preview and initial device state
 - `components/call-view.tsx` - waiting and peer-present call layout
+- `components/invite-button.tsx` - invitation copy and user feedback
 - `app/api/token/route.ts` - initial token and same-UID renewal
 - `lib/rtc-session.ts` - join, publish, subscribe, renew, and cleanup
 - `scripts/doctor.mjs` - local runtime and environment checks
@@ -75,6 +76,8 @@ This repository is the Agora RTC Web one-to-one quickstart for Next.js.
 - The current `agent-quickstart-nextjs` rendered UI is the first visual reference.
 - Preserve its cool page background, dark interaction surface, Agora cyan CTA, Lucide icon style, in-call header, and Powered by Agora attribution.
 - Keep local and remote video tile dimensions stable between waiting and peer-present states.
+- Keep invitation actions visible before join and while waiting for a participant.
+- Use system-selected devices by default; keep manual device selection available behind settings.
 - Use icons and tooltips for familiar call controls. Keep visible text operational, not tutorial copy.
 - Update README screenshots whenever material UI changes make existing evidence stale.
 

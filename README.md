@@ -8,7 +8,7 @@ the same room URL from another independent client for complete RTC media.
 
 ## Prerequisites
 
-- Node.js 22 or newer
+- Node.js 22.x or 24.x (both tested in CI; Node 22 is the default in `.nvmrc`)
 - pnpm 9.15.9
 - An Agora project with an App ID and primary App Certificate
 - A supported browser with camera and microphone permission for live RTC
@@ -29,7 +29,8 @@ pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000), select **Create Room**,
-complete device setup, and select **Join Call**.
+copy the invite link, confirm the automatically selected devices, and select
+**Join Call**. Manual device selection is available from **Select devices**.
 
 ## Working From A Clone
 
@@ -58,8 +59,10 @@ Certificate only at runtime.
 
 ### Single-client success
 
-On the pre-join screen, select your microphone and camera, choose their initial
-state, and select **Join Call**. A successful single-client run:
+On the pre-join screen, copy the invite link, choose the initial microphone and
+camera state, and select **Join Call**. The browser and Agora SDK use the system
+devices by default; open **Select devices** only when a manual choice is needed.
+A successful single-client run:
 
 - issues an RTC token;
 - joins the generated room with a numeric UID;
@@ -85,7 +88,8 @@ When testing twice on one computer:
 ## What You Get
 
 - Next.js App Router UI matching the Agora agent starter visual shell
-- pre-join preview and microphone/camera selection
+- pre-join preview with automatic devices and optional manual selection
+- visible invite actions before join and while waiting for a participant
 - microphone and camera controls during the call
 - direct `agora-rtc-sdk-ng` join, publish, subscribe, renewal, and cleanup
 - URL-only UUID rooms with no database
@@ -97,8 +101,9 @@ When testing twice on one computer:
 ## How It Works
 
 The home page creates a UUID room URL. The room initializes available local
-media but does not join until the user acts. `POST /api/token` validates the
-room, creates or reuses a numeric UID, and returns a non-cacheable RTC token.
+media from system defaults, exposes the room URL for invitation, and does not
+join until the user acts. `POST /api/token` validates the room, creates or reuses
+a numeric UID, and returns a non-cacheable RTC token.
 The browser registers events, joins, publishes local tracks, and subscribes to
 remote audio and video independently. Token renewal reuses the same room and UID.
 Leaving releases listeners, tracks, devices, and the RTC client.
@@ -152,6 +157,7 @@ Docker, and production boundaries.
 - `app/room/[roomId]/page.tsx` - validated room entry
 - `components/room-experience.tsx` - pre-join and call state machine
 - `components/pre-join.tsx` - local device setup
+- `components/invite-button.tsx` - shared invitation copy and feedback
 - `components/call-view.tsx` - one-to-one call layout
 - `lib/rtc-session.ts` - Agora client lifecycle
 - `lib/media-devices.ts` - partial media and device handling

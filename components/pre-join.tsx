@@ -1,10 +1,12 @@
 'use client';
 
-import { Camera, CameraOff, Loader2, Mic, MicOff, PhoneCall } from 'lucide-react';
+import { useState } from 'react';
+import { Camera, CameraOff, Loader2, Mic, MicOff, PhoneCall, Settings } from 'lucide-react';
 import type { LocalMedia } from '@/lib/media-devices';
 import { BrandFooter } from '@/components/brand-footer';
 import { Button } from '@/components/ui/button';
 import { DeviceSelect } from '@/components/device-select';
+import { InviteButton } from '@/components/invite-button';
 import { VideoTile } from '@/components/video-tile';
 
 type PreJoinProps = {
@@ -40,6 +42,8 @@ export function PreJoin({
   onCameraToggle,
   onJoin,
 }: PreJoinProps) {
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
   return (
     <main className="relative flex min-h-dvh items-center justify-center bg-background px-4 py-16 text-foreground">
       <section className="dark-panel grid w-full max-w-4xl animate-fade-up gap-6 rounded-[20px] p-5 md:grid-cols-[1.35fr_1fr] md:p-7">
@@ -83,34 +87,54 @@ export function PreJoin({
             >
               {cameraEnabled ? <Camera className="h-4 w-4" /> : <CameraOff className="h-4 w-4" />}
             </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="icon"
+              onClick={() => setSettingsOpen((open) => !open)}
+              title="Select devices"
+              aria-label="Select devices"
+              aria-expanded={settingsOpen}
+              aria-controls="prejoin-device-settings"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
           </div>
 
-          <div className="mt-5 flex flex-col gap-4">
-            <DeviceSelect
-              id="prejoin-microphone"
-              label="Microphone"
-              devices={microphones}
-              value={microphoneId}
-              onChange={onMicrophoneChange}
-            />
-            <DeviceSelect
-              id="prejoin-camera"
-              label="Camera"
-              devices={cameras}
-              value={cameraId}
-              onChange={onCameraChange}
-            />
-          </div>
+          {settingsOpen && (
+            <div
+              id="prejoin-device-settings"
+              className="mt-5 flex flex-col gap-4 rounded-lg border border-[#343434] bg-[#151515] p-4"
+            >
+              <DeviceSelect
+                id="prejoin-microphone"
+                label="Microphone"
+                devices={microphones}
+                value={microphoneId}
+                onChange={onMicrophoneChange}
+              />
+              <DeviceSelect
+                id="prejoin-camera"
+                label="Camera"
+                devices={cameras}
+                value={cameraId}
+                onChange={onCameraChange}
+              />
+            </div>
+          )}
 
           {Object.values(media.errors).map((message) => (
             <p key={message} className="mt-3 text-xs text-amber-300">{message}</p>
           ))}
           {error && <p className="mt-3 text-xs text-destructive">{error}</p>}
 
-          <Button className="mt-6 w-full" onClick={onJoin} disabled={joining || (!media.microphone && !media.camera)}>
-            {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : <PhoneCall className="h-4 w-4" />}
-            {joining ? 'Joining...' : 'Join Call'}
-          </Button>
+          <div className="mt-6 grid gap-2 sm:grid-cols-2">
+            <InviteButton className="w-full" />
+            <Button className="w-full" onClick={onJoin} disabled={joining || (!media.microphone && !media.camera)}>
+              {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : <PhoneCall className="h-4 w-4" />}
+              {joining ? 'Joining...' : 'Join Call'}
+            </Button>
+          </div>
         </div>
       </section>
       <BrandFooter />

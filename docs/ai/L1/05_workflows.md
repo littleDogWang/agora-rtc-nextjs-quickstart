@@ -5,8 +5,10 @@
 ## First Success
 
 Install, copy the environment example, add credentials, run doctor, start the
-app, create a room, and join. For complete RTC success, join the exact room from
-a second independent client and verify audio and video receipt both ways.
+app, create a room, copy its invite link, and join with the automatically selected
+devices. Use settings only when manual device selection is needed. For complete
+RTC success, join the exact room from a second independent client and verify audio
+and video receipt both ways.
 
 ## Modify The RTC Core Flow
 

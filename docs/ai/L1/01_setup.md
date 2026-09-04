@@ -4,7 +4,7 @@
 
 ## Prerequisites
 
-- Node.js 22 or newer and pnpm 9.15.9
+- Node.js 22.x or 24.x and pnpm 9.15.9; both Node lines run in CI
 - Docker for image build and startup verification
 - an Agora App ID and App Certificate for live RTC
 - browser camera and microphone permission for media checks

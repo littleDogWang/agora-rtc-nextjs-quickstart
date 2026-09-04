@@ -2,7 +2,8 @@
 
 ## Development Setup
 
-Use Node.js 22 or newer and pnpm 9.15.9. Follow [README.md](README.md) to install
+Use Node.js 22.x or 24.x and pnpm 9.15.9. Both Node LTS lines run in CI; `.nvmrc`
+selects Node 22 as the default. Follow [README.md](README.md) to install
 dependencies and create `.env.local`. Real credentials are needed only for live
 RTC checks; static checks and builds may use obviously synthetic values.
 
@@ -35,6 +36,7 @@ pnpm test -- tests/rtc-session.test.ts
 pnpm test -- tests/token-route.test.ts
 pnpm test -- tests/media-devices.test.ts
 pnpm test -- tests/starter-ui.test.tsx
+pnpm test -- tests/node-support.test.mjs
 ```
 
 Run the canonical project check before review:

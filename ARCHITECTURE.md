@@ -30,8 +30,9 @@ canonical lowercase UUID and mounts `components/room-experience.tsx`.
 
 1. The home page creates a UUID room URL.
 2. The room experience imports `agora-rtc-sdk-ng` in the browser and requests
-   camera and microphone access.
-3. The user explicitly selects **Join Call**.
+   camera and microphone access using the system-selected devices by default.
+3. Pre-join exposes the room URL for invitation. Manual device selection remains
+   available behind settings, and the user explicitly selects **Join Call**.
 4. The browser calls `POST /api/token` with the room ID. The server validates the
    UUID, creates a positive numeric UID, and returns App ID, room ID, UID, token,
    and relative expiration under `Cache-Control: no-store`.
@@ -72,7 +73,8 @@ must use the same room ID and numeric UID.
 There is exactly one `RtcSession` per mounted room session. Event handlers are
 registered before join so existing publications are not missed. Audio and video
 publication events remain separate. A missing camera or microphone does not
-block the other available media type.
+block the other available media type. Device changes refresh the available list;
+manual selection is optional and does not block the default join path.
 
 ## Runtime Modes
 
@@ -80,7 +82,8 @@ block the other available media type.
 
 `pnpm dev` runs Next.js on `http://localhost:3000`. Localhost may access media
 devices without HTTPS. `.env.local` supplies the two Agora values to the server
-process.
+process. Node.js 22.x and 24.x are supported; Docker uses Node.js 22 as the
+reference production runtime.
 
 ### Vercel
 

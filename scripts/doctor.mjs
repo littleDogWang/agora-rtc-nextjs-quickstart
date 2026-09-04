@@ -1,5 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {
+  isSupportedNodeVersion,
+  supportedNodeDescription,
+} from './node-support.mjs';
 
 const projectRoot = process.cwd();
 
@@ -8,9 +12,8 @@ function fail(message) {
   process.exit(1);
 }
 
-const nodeMajor = Number.parseInt(process.versions.node.split('.')[0], 10);
-if (!Number.isInteger(nodeMajor) || nodeMajor < 22) {
-  fail(`Node.js 22 or newer is required. Current version: ${process.versions.node}`);
+if (!isSupportedNodeVersion(process.versions.node)) {
+  fail(`${supportedNodeDescription} is required. Current version: ${process.versions.node}`);
 }
 
 if (!process.env.npm_config_user_agent?.includes('pnpm/9.')) {
